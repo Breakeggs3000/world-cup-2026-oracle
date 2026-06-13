@@ -4,7 +4,7 @@
 
 ## Name
 
-World Cup Predictor (idea-board)
+World Cup 2026 Oracle ([world-cup-2026-oracle](https://github.com/Breakeggs3000/world-cup-2026-oracle))
 
 ## Purpose
 

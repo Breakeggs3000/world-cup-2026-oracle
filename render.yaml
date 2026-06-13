@@ -1,10 +1,10 @@
-# Render Blueprint — World Cup Predictor API
-# Deploy: connect this repo in Render Dashboard → New → Blueprint → apply render.yaml
-# Or: render blueprint sync (Render CLI)
+# Render Blueprint — World Cup 2026 Oracle API
+# Repo: https://github.com/Breakeggs3000/world-cup-2026-oracle
+# Deploy: Render Dashboard → New → Blueprint → connect repo → apply render.yaml
 
 services:
   - type: web
-    name: world-cup-predictor-api
+    name: world-cup-2026-oracle-api
     runtime: python
     plan: free
     buildCommand: >-

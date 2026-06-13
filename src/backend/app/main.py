@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="World Cup Predictor", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="World Cup 2026 Oracle", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

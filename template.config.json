@@ -1,8 +1,8 @@
 {
     "version":  "1",
-    "name":  "idea-board",
+    "name":  "world-cup-2026-oracle",
     "created":  "2026-06-13",
     "kind":  "agent-workspace-project",
-    "slug":  "idea-board",
+    "slug":  "world-cup-2026-oracle",
     "template":  "pilot101"
 }

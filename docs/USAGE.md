@@ -1,10 +1,10 @@
-# World Cup Predictor — Run & Usage Guide
+# World Cup 2026 Oracle — Run & Usage Guide
 
 Step-by-step instructions to set up, run, and use every tab in the UI.
 
 ## Quick checklist (first time)
 
-From the repo root (`idea-board/`):
+From the repo root:
 
 ```powershell
 # 1. Backend: Python env + data + backtest

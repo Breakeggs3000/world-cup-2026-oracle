@@ -11,7 +11,7 @@ function App() {
     <BrowserRouter>
       <div className="app">
         <nav className="sidebar">
-          <div className="logo">⚽ WC Predictor</div>
+          <div className="logo">⚽ WC 2026 Oracle</div>
           <NavLink to="/" end>Backtest</NavLink>
           <NavLink to="/history">Historical WC</NavLink>
           <NavLink to="/wc2026">WC 2026</NavLink>
