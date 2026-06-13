@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -52,9 +53,11 @@ def compute_data_fingerprint(csv_path: Path | None = None) -> str:
     if not path.exists():
         return "missing"
     stat = path.stat()
+    digest = hashlib.sha256()
     with path.open("rb") as handle:
-        head = handle.read(4096)
-    return f"sha256-prefix:{hash(head)}:{stat.st_size}:{int(stat.st_mtime)}"
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return f"sha256:{digest.hexdigest()}:{stat.st_size}:{int(stat.st_mtime)}"
 
 
 def list_models() -> list[dict[str, Any]]:

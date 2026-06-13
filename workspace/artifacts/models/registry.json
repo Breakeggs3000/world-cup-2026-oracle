@@ -27,7 +27,7 @@
         "D",
         "L"
       ],
-      "data_fingerprint": "sha256-prefix:5478482280495977275:3724391:1781358804",
+      "data_fingerprint": "sha256:d707e5527d2cb0e5a87925b56e9e4fc96513f1fba8b0ca704609d9e98889b8e1:3724391:1781358804",
       "data_source": "src/backend/app/data/cache/results.csv",
       "tags": [
         "baseline"
