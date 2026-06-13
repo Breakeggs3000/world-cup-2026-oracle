@@ -24,13 +24,15 @@ def _allowed_origins() -> list[str]:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Pre-build the trained model so first UI request is not a multi-minute wait."""
-    logger.info("Warming up prediction model (first load takes ~2–3 minutes)…")
+    """Start accepting requests immediately; model loads lazily on first use."""
+    logger.info("API ready — prediction model loads on first request.")
+    yield
+
+
+def _model_is_cached() -> bool:
     from app.services import get_trained_system
 
-    get_trained_system()
-    logger.info("Model ready.")
-    yield
+    return get_trained_system.cache_info().currsize > 0
 
 
 app = FastAPI(title="World Cup 2026 Oracle", version="1.0.0", lifespan=lifespan)
@@ -54,19 +56,13 @@ app.include_router(simulation.router)
 @app.get("/api/health")
 def health():
     from app.model.artifacts import get_active_model_id
-    from app.services import get_trained_system
 
-    try:
-        get_trained_system()
-        return {
-            "status": "ok",
-            "model_ready": True,
-            "active_model_id": get_active_model_id(),
-        }
-    except Exception as exc:
-        return {
-            "status": "degraded",
-            "model_ready": False,
-            "active_model_id": get_active_model_id(),
-            "error": str(exc),
-        }
+    ready = _model_is_cached()
+    payload: dict = {
+        "status": "ok" if ready else "starting",
+        "model_ready": ready,
+        "active_model_id": get_active_model_id(),
+    }
+    if not ready:
+        payload["message"] = "Model not loaded yet — first prediction request triggers warmup."
+    return payload

@@ -57,7 +57,28 @@ def compute_data_fingerprint(csv_path: Path | None = None) -> str:
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
-    return f"sha256:{digest.hexdigest()}:{stat.st_size}:{int(stat.st_mtime)}"
+    # Content + size only — mtime changes whenever CSV is re-downloaded on deploy.
+    return f"sha256:{digest.hexdigest()}:{stat.st_size}"
+
+
+def _normalize_data_fingerprint(fingerprint: str) -> str:
+    """Compare fingerprints ignoring legacy mtime suffix."""
+    parts = fingerprint.split(":")
+    if len(parts) >= 3 and parts[0] == "sha256":
+        return ":".join(parts[:3])
+    return fingerprint
+
+
+def artifacts_match_committed_data(model_id: str | None = None) -> bool:
+    """Lightweight check — no joblib load. Used during Docker build."""
+    resolved_id = model_id or get_active_model_id()
+    if not resolved_id or not model_bundle_exists(resolved_id):
+        return False
+    metadata_path = model_dir(resolved_id) / "metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    expected = _normalize_data_fingerprint(metadata.get("data_fingerprint", ""))
+    current = _normalize_data_fingerprint(compute_data_fingerprint())
+    return bool(expected) and expected == current
 
 
 def list_models() -> list[dict[str, Any]]:
@@ -186,7 +207,9 @@ def load_model_bundle(model_id: str | None = None) -> ModelBundle:
     history_df = load_results()
     expected_fp = metadata.get("data_fingerprint")
     current_fp = compute_data_fingerprint()
-    if expected_fp and expected_fp != current_fp:
+    if expected_fp and _normalize_data_fingerprint(expected_fp) != _normalize_data_fingerprint(
+        current_fp
+    ):
         raise ValueError(
             f"Data fingerprint mismatch for {resolved_id}. "
             "Retrain with scripts/train_model.py after refreshing results.csv."

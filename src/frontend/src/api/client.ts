@@ -1,10 +1,32 @@
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 const BASE = API_ORIGIN ? `${API_ORIGIN}/api` : '/api';
+const REQUEST_TIMEOUT_MS = 120_000;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, options);
-  if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
-  return res.json();
+  if (import.meta.env.PROD && !API_ORIGIN) {
+    throw new Error(
+      'VITE_API_URL is not set. Add your Render backend URL in Vercel → Settings → Environment Variables, then redeploy.'
+    );
+  }
+
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(`${BASE}${path}`, { ...options, signal: controller.signal });
+    if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
+    return res.json();
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error(
+        `API timed out after ${REQUEST_TIMEOUT_MS / 1000}s (${BASE}${path}). ` +
+          'Render free tier may be waking up — wait 60s and refresh, or check the backend logs.'
+      );
+    }
+    throw err;
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 export interface Probabilities {

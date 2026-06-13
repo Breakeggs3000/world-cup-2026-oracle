@@ -1,5 +1,5 @@
-# Railway config (optional — create a service from repo root)
-# Set root directory to repo root; build/start run from src/backend.
+# Railway config — Dockerfile build from repo root
+# Repo: https://github.com/Breakeggs3000/world-cup-2026-oracle
 
 [build]
 builder = "DOCKERFILE"
@@ -7,4 +7,5 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 healthcheckPath = "/api/health"
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

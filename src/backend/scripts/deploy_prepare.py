@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import subprocess
 import sys
 from pathlib import Path
@@ -18,7 +19,36 @@ def _run(script: str, *args: str) -> None:
     subprocess.run([sys.executable, str(path), *args], check=True)
 
 
-def main() -> int:
+def build_verify() -> int:
+    """Docker/Railway build step — fetch CSV and verify artifacts; never train (OOM risk)."""
+    sys.path.insert(0, str(BACKEND_ROOT))
+    _run("fetch_data.py")
+
+    from app.model.artifacts import (
+        artifacts_match_committed_data,
+        get_active_model_id,
+        model_bundle_exists,
+    )
+
+    model_id = get_active_model_id()
+    if not model_id or not model_bundle_exists(model_id):
+        raise SystemExit("Model artifacts missing from repo — run scripts/train_model.py locally.")
+    if not artifacts_match_committed_data(model_id):
+        raise SystemExit(
+            "Data fingerprint mismatch after fetch — retrain locally and commit model artifacts."
+        )
+
+    if not REPORT_PATH.exists():
+        raise SystemExit(
+            "backtest_report.json missing — run scripts/run_backtest.py locally and commit it."
+        )
+
+    print("Build verify OK.")
+    return 0
+
+
+def full_prepare() -> int:
+    """Full bootstrap for Render/native deploy — may train or backtest if artifacts missing."""
     sys.path.insert(0, str(BACKEND_ROOT))
 
     _run("fetch_data.py")
@@ -39,6 +69,19 @@ def main() -> int:
 
     print("Deploy prepare complete.")
     return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Production deploy bootstrap")
+    parser.add_argument(
+        "--build",
+        action="store_true",
+        help="Lightweight verify for Docker build (no train/backtest)",
+    )
+    args = parser.parse_args()
+    if args.build:
+        return build_verify()
+    return full_prepare()
 
 
 if __name__ == "__main__":

@@ -218,6 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Agent workspace — ephemeral agent working files
+logs*.json
 workspace/scratch/*
 !workspace/scratch/.gitkeep
 workspace/sessions/
@@ -227,7 +228,6 @@ workspace/sessions/
 src/backend/.venv/
 src/backend/.pytest_cache/
 src/backend/app/data/cache/
-workspace/artifacts/backtest_report.json
 
 # Frontend
 src/frontend/node_modules/
