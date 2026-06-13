@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { api, Wc2026Fixture } from '../api/client';
 import { MatchCard } from '../components/MatchCard';
 
 type Tab = 'all' | 'upcoming' | 'played';
 
-function formatAgo(iso: string | undefined, t: (k: string, o?: object) => string): string {
+function formatAgo(iso: string | undefined, t: TFunction): string {
   if (!iso) return '';
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.max(0, Math.round(diff / 60000));
