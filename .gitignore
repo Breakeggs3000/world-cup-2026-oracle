@@ -222,3 +222,14 @@ workspace/scratch/*
 !workspace/scratch/.gitkeep
 workspace/sessions/
 *.agent.log
+
+# World Cup predictor — downloaded data, venv, generated reports
+src/backend/.venv/
+src/backend/.pytest_cache/
+src/backend/app/data/cache/
+workspace/artifacts/backtest_report.json
+
+# Frontend
+src/frontend/node_modules/
+src/frontend/dist/
+node_modules/

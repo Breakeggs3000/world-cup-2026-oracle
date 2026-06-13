@@ -4,33 +4,42 @@
 
 ## Name
 
-idea-board
+World Cup Predictor (idea-board)
 
 ## Purpose
 
-Web app for capturing, organizing, and exploring ideas
+Interactive web application for predicting international football match outcomes (Win / Draw / Loss) using real historical data, with honest walk-forward backtesting, 2026 World Cup fixture exploration, scenario tweaking, and Monte Carlo tournament simulation.
 
 ## Current status
 
-Greenfield - workspace scaffold ready; application code not yet started.
+MVP complete: FastAPI backend, React frontend, Elo + multinomial logistic model, backtest pipeline, and WC 2026 fixtures.
 
 ## Tech stack
 
-_To be decided._ Document choices here before agents implement in `src/`.
+| Layer | Choice |
+|-------|--------|
+| Backend | Python 3.11+, FastAPI, pandas, scikit-learn |
+| Frontend | React 18, TypeScript, Vite, Recharts |
+| Data | martj42/international_results (CC0), static WC 2026 fixtures JSON |
+| Model | Chronological Elo + multinomial logistic regression on capped features |
 
 ## Repository map
 
 | Path | Contents |
 |------|----------|
-| `src/` | Application source |
-| `agents/` | Role and crew definitions |
-| `tasks/` | Work backlog |
-| `workspace/` | Scratch and artifacts |
+| `src/backend/` | FastAPI app, ML models, data scripts |
+| `src/frontend/` | React UI |
+| `workspace/artifacts/` | Generated backtest report |
+| `context/` | Project knowledge and ADRs |
+| `tasks/backlog/` | Task specs |
 
 ## Success criteria
 
-_Define what "done" looks like for this product._
+- Walk-forward backtest beats naive Elo baseline on 2023+ test split
+- ~55–62% out-of-sample W/D/L accuracy (aligned with published Elo baselines)
+- UI browses historical World Cups (1990–2022), WC 2026 fixtures, scenario sliders, and tournament simulation
+- Leakage test passes: truncated Elo run matches full run at same cutoff date
 
 ## Contacts / ownership
 
-_Optional._
+Agent workspace project generated from pilot101 template.

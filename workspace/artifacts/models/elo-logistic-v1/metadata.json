@@ -1,0 +1,61 @@
+{
+  "id": "elo-logistic-v1",
+  "name": "Elo + Multinomial Logistic (baseline)",
+  "family": "elo_logistic",
+  "algorithm": "LogisticRegression",
+  "created_at": "2026-06-13T15:00:18.517890+00:00",
+  "train_end": "2017-12-31",
+  "val_end": "2022-12-31",
+  "feature_names": [
+    "delta_elo",
+    "abs_delta_elo",
+    "form_5_home",
+    "form_5_away",
+    "form_10_home",
+    "form_10_away",
+    "days_rest_diff",
+    "is_knockout",
+    "confed_same",
+    "h2h_home_win_rate"
+  ],
+  "outcome_order": [
+    "W",
+    "D",
+    "L"
+  ],
+  "data_fingerprint": "sha256-prefix:5478482280495977275:3724391:1781358804",
+  "data_source": "src/backend/app/data/cache/results.csv",
+  "tags": [
+    "baseline"
+  ],
+  "hyperparameters": {
+    "max_iter": 1000,
+    "random_state": 42,
+    "classifier": "LogisticRegression"
+  },
+  "metrics": {
+    "validation": {
+      "accuracy": 0.5931,
+      "log_loss": 0.8838,
+      "brier": 0.1734,
+      "rps": 0.2732,
+      "count": 4510
+    },
+    "test": {
+      "accuracy": 0.5997,
+      "log_loss": 0.8721,
+      "brier": 0.1709,
+      "rps": 0.2757,
+      "count": 3602
+    },
+    "beats_naive_by": 0.012,
+    "naive_baseline_test_accuracy": 0.5877
+  },
+  "notes": "",
+  "artifact_files": {
+    "predictor": "predictor.joblib",
+    "enriched": "enriched.joblib",
+    "elo_ratings": "elo_ratings.json",
+    "metrics": "metrics.json"
+  }
+}

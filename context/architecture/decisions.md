@@ -58,6 +58,59 @@ Multiple vibe-coding experiments in one repo pollute `context/`, `memory/`, and 
 
 ---
 
+## ADR-002: World Cup predictor stack
+
+**Status:** Accepted  
+**Date:** 2026-06-13
+
+### Context
+
+The project pivoted from a generic idea board to a football prediction app requiring ML backtesting, an API, and an interactive UI.
+
+### Decision
+
+- **Backend:** Python FastAPI under `src/backend/` with Elo engine + multinomial logistic head
+- **Frontend:** React 18 + TypeScript + Vite + Recharts under `src/frontend/`
+- **Data:** martj42 international results CSV (cached locally); static `wc2026_fixtures.json` and `team_aliases.json`
+- **Evaluation:** Walk-forward temporal splits (train ≤2017, val 2018–2022, test 2023+); report to `workspace/artifacts/backtest_report.json`
+- **Stretch:** Monte Carlo group-stage simulation with simplified knockout champion selection
+
+### Consequences
+
+- No runtime scraping; 2026 schedule updates are manual JSON edits
+- Model complexity capped at Elo+logit unless validation shows >0.5% gain from boosting (not pursued)
+- Vite dev server proxies `/api` to FastAPI on port 8000
+
+---
+
+## ADR-003: Versioned model artifact registry
+
+**Status:** Accepted  
+**Date:** 2026-06-13
+
+### Context
+
+Retraining from scratch on every API cold start is slow (~minutes). Future work (cross-validation, ensembles, RL) requires multiple persisted model checkpoints with metadata and comparable metrics.
+
+### Decision
+
+- Store trained bundles under `workspace/artifacts/models/{model_id}/`:
+  - `predictor.joblib` (sklearn head + scaler)
+  - `enriched.joblib` (precomputed feature matrix for evaluation)
+  - `elo_ratings.json`, `metrics.json`, `metadata.json`
+- Maintain `registry.json` with `active_model_id` and per-model tags, hyperparameters, and data fingerprint
+- API loads active artifact when fingerprint matches `results.csv`; fallback to live training if missing/stale
+- `scripts/train_model.py` trains baseline and registers artifact; `GET /api/models` lists registry
+- Runtime override via `WC_MODEL_ID` environment variable
+
+### Consequences
+
+- First startup after `train_model.py` is fast (seconds vs minutes)
+- Git tracks baseline model artifacts for reproducibility; retrain when data fingerprint changes
+- New model families add a directory + registry entry without changing API surface
+
+---
+
 ## Template for new ADRs
 
 ```markdown
