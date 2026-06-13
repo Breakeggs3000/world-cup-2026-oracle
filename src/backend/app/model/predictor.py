@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -178,10 +179,14 @@ class MatchPredictor:
         form_boost_home: float = 0.0,
         form_boost_away: float = 0.0,
         is_knockout: bool = False,
+        elo_engine: EloEngine | None = None,
     ) -> dict[str, Any]:
-        engine = EloEngine()
-        prior = history_df[history_df["date"] < match_date].sort_values("date")
-        engine.process_dataframe(prior)
+        if elo_engine is None:
+            engine = EloEngine()
+            prior = history_df[history_df["date"] < match_date].sort_values("date")
+            engine.process_dataframe(prior)
+        else:
+            engine = elo_engine
 
         elo_home = engine.get_rating(home) + (0.0 if neutral else 100.0)
         elo_away = engine.get_rating(away)
@@ -219,16 +224,50 @@ class MatchPredictor:
         }
 
     def implied_scoreline(self, probs: dict[str, float], elo_home: float, elo_away: float) -> str:
-        """Simple scoreline heuristic from Elo gap and draw probability."""
-        gap = elo_home - elo_away
-        if probs["D"] > max(probs["W"], probs["L"]):
-            return "1-1"
-        if gap > 150:
-            return "2-0"
-        if gap > 50:
-            return "2-1"
-        if gap < -150:
-            return "0-2"
-        if gap < -50:
-            return "1-2"
-        return "1-0" if probs["W"] >= probs["L"] else "0-1"
+        """Most likely scoreline from the Poisson score distribution."""
+        top = self.top_outcomes(probs, elo_home, elo_away, n=1)
+        return top[0]["score"] if top else "1-1"
+
+    @staticmethod
+    def _poisson_pmf(k: int, lam: float) -> float:
+        if lam <= 0:
+            return 1.0 if k == 0 else 0.0
+        return math.exp(-lam) * (lam**k) / math.factorial(k)
+
+    def top_outcomes(
+        self,
+        probs: dict[str, float],
+        elo_home: float,
+        elo_away: float,
+        n: int = 5,
+        max_goals: int = 5,
+    ) -> list[dict[str, float | str]]:
+        """Top-N scorelines from independent Poisson rates derived from W/D/L probs."""
+        mu = 2.45 + min(abs(elo_home - elo_away) / 400.0, 1.0) * 0.35
+        rho_h = probs["W"] + 0.5 * probs["D"]
+        rho_a = probs["L"] + 0.5 * probs["D"]
+        denom = rho_h + rho_a
+        if denom <= 0:
+            lam_h = lam_a = mu / 2
+        else:
+            lam_h = mu * rho_h / denom
+            lam_a = mu * rho_a / denom
+
+        draw_boost = 1.0 + probs["D"] * 0.5
+        raw: list[tuple[str, float]] = []
+        for h in range(max_goals + 1):
+            for a in range(max_goals + 1):
+                p = self._poisson_pmf(h, lam_h) * self._poisson_pmf(a, lam_a)
+                if h == a:
+                    p *= draw_boost
+                raw.append((f"{h}-{a}", p))
+
+        total = sum(p for _, p in raw)
+        if total <= 0:
+            return [{"score": "1-1", "probability": 1.0}]
+
+        normalized = sorted(((s, p / total) for s, p in raw), key=lambda x: -x[1])
+        return [
+            {"score": score, "probability": round(prob, 4)}
+            for score, prob in normalized[:n]
+        ]

@@ -1,0 +1,10 @@
+# Railway config (optional — create a service from repo root)
+# Set root directory to repo root; build/start run from src/backend.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/health"
+restartPolicyType = "ON_FAILURE"

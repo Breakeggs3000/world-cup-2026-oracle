@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { api, Probabilities } from '../api/client';
+import { api, Probabilities, ScoreOutcome } from '../api/client';
 import { ProbabilityBar } from '../components/ProbabilityBar';
+import { TopOutcomes } from '../components/TopOutcomes';
 
 const TEAMS = [
   'Brazil', 'Argentina', 'France', 'Germany', 'England', 'Spain', 'Portugal',
@@ -19,6 +20,7 @@ export default function MatchExplorer() {
   const [knockout, setKnockout] = useState(false);
   const [probs, setProbs] = useState<Probabilities | null>(null);
   const [scoreline, setScoreline] = useState('');
+  const [topOutcomes, setTopOutcomes] = useState<ScoreOutcome[]>([]);
   const [predicted, setPredicted] = useState('');
 
   const fetchPrediction = useCallback(() => {
@@ -29,6 +31,7 @@ export default function MatchExplorer() {
     }).then((r) => {
       setProbs(r.probabilities as Probabilities);
       setScoreline(String(r.likely_scoreline || ''));
+      setTopOutcomes((r.top_outcomes as ScoreOutcome[]) || []);
       setPredicted(String(r.predicted_outcome || ''));
     });
   }, [home, away, homeEloAdj, awayEloAdj, formHome, formAway, knockout]);
@@ -85,7 +88,8 @@ export default function MatchExplorer() {
           {probs && <ProbabilityBar probs={probs} label="W / D / L probabilities" />}
           <div className="prediction-summary">
             <p>Predicted outcome: <strong>{predicted}</strong></p>
-            <p>Likely scoreline: <strong>{scoreline}</strong></p>
+            <p>Most likely scoreline: <strong>{scoreline}</strong></p>
+            {topOutcomes.length > 0 && <TopOutcomes outcomes={topOutcomes} />}
           </div>
         </div>
       </div>

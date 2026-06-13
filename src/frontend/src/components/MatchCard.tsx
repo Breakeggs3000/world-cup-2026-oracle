@@ -1,5 +1,6 @@
 import { Wc2026Fixture } from '../api/client';
 import { ProbabilityBar } from './ProbabilityBar';
+import { TopOutcomes } from './TopOutcomes';
 
 export function MatchCard({ match }: { match: Wc2026Fixture }) {
   const played = match.status === 'played';
@@ -20,7 +21,10 @@ export function MatchCard({ match }: { match: Wc2026Fixture }) {
         <ProbabilityBar probs={match.probabilities} label="Prediction" />
       )}
       {match.likely_scoreline && (
-        <div className="scoreline">Likely: {match.likely_scoreline}</div>
+        <div className="scoreline">Most likely: {match.likely_scoreline}</div>
+      )}
+      {match.top_outcomes && match.top_outcomes.length > 0 && (
+        <TopOutcomes outcomes={match.top_outcomes} />
       )}
       {played && match.prediction_correct !== undefined && (
         <span className={`badge ${match.prediction_correct ? 'hit' : 'miss'}`}>

@@ -51,6 +51,11 @@ def wc2026_fixtures(status: str = Query("all", pattern="^(all|upcoming|played)$"
     fixtures = filter_wc2026_fixtures(status)
     predictor, df, _ = get_trained_system()
 
+    from app.model.elo import EloEngine
+
+    elo_engine = EloEngine()
+    elo_engine.process_dataframe(df.sort_values("date"))
+
     enriched = []
     for fx in fixtures:
         item = dict(fx)
@@ -63,10 +68,14 @@ def wc2026_fixtures(status: str = Query("all", pattern="^(all|upcoming|played)$"
                 pd.Timestamp(fx["date"]),
                 df,
                 neutral=fx.get("neutral", True),
+                elo_engine=elo_engine,
             )
             item["probabilities"] = pred["probabilities"]
             item["predicted_outcome"] = pred["predicted_outcome"]
             item["likely_scoreline"] = predictor.implied_scoreline(
+                pred["probabilities"], pred["elo_home"], pred["elo_away"]
+            )
+            item["top_outcomes"] = predictor.top_outcomes(
                 pred["probabilities"], pred["elo_home"], pred["elo_away"]
             )
             if fx.get("status") == "played":

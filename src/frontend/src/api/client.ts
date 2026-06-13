@@ -1,4 +1,5 @@
-const BASE = '/api';
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+const BASE = API_ORIGIN ? `${API_ORIGIN}/api` : '/api';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, options);
@@ -37,6 +38,11 @@ export interface MatchPrediction {
   correct?: boolean;
 }
 
+export interface ScoreOutcome {
+  score: string;
+  probability: number;
+}
+
 export interface Wc2026Fixture {
   id: string;
   date: string;
@@ -52,6 +58,7 @@ export interface Wc2026Fixture {
   probabilities?: Probabilities;
   predicted_outcome?: string;
   likely_scoreline?: string;
+  top_outcomes?: ScoreOutcome[];
   actual_outcome?: string;
   prediction_correct?: boolean;
 }

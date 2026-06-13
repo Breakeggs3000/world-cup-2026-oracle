@@ -38,7 +38,8 @@ def normalize_team(name: str | None) -> str:
     return load_aliases().get(cleaned, cleaned)
 
 
-def load_results(use_cache: bool = True) -> pd.DataFrame:
+@lru_cache(maxsize=1)
+def _load_results_cached() -> pd.DataFrame:
     if not RESULTS_CSV.exists():
         raise FileNotFoundError(
             f"Results CSV not found at {RESULTS_CSV}. Run scripts/fetch_data.py first."
@@ -56,6 +57,12 @@ def load_results(use_cache: bool = True) -> pd.DataFrame:
     df["country"] = df.get("country", pd.Series([""] * len(df))).fillna("").astype(str)
     df = df.sort_values("date").reset_index(drop=True)
     return df
+
+
+def load_results(use_cache: bool = True) -> pd.DataFrame:
+    if not use_cache:
+        _load_results_cached.cache_clear()
+    return _load_results_cached().copy()
 
 
 def outcome_label(home_score: int, away_score: int) -> str:

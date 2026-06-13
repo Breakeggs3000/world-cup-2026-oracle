@@ -1,0 +1,21 @@
+# Render Blueprint — World Cup Predictor API
+# Deploy: connect this repo in Render Dashboard → New → Blueprint → apply render.yaml
+# Or: render blueprint sync (Render CLI)
+
+services:
+  - type: web
+    name: world-cup-predictor-api
+    runtime: python
+    plan: free
+    buildCommand: >-
+      cd src/backend &&
+      pip install -r requirements.txt &&
+      python scripts/deploy_prepare.py
+    startCommand: cd src/backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: ALLOWED_ORIGINS
+        sync: false
+        # Set in dashboard, e.g. https://your-app.vercel.app

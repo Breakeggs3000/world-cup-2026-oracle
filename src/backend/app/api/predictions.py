@@ -36,6 +36,9 @@ def predict_match(
     result["likely_scoreline"] = predictor.implied_scoreline(
         result["probabilities"], result["elo_home"], result["elo_away"]
     )
+    result["top_outcomes"] = predictor.top_outcomes(
+        result["probabilities"], result["elo_home"], result["elo_away"]
+    )
     return result
 
 
@@ -56,7 +59,12 @@ def predict_scenario(body: ScenarioRequest):
         form_boost_away=body.form_boost_away,
         is_knockout=body.is_knockout,
     )
+    elo_h = result["elo_home"] + body.home_elo_adj
+    elo_a = result["elo_away"] + body.away_elo_adj
     result["likely_scoreline"] = predictor.implied_scoreline(
-        result["probabilities"], result["elo_home"] + body.home_elo_adj, result["elo_away"] + body.away_elo_adj
+        result["probabilities"], elo_h, elo_a
+    )
+    result["top_outcomes"] = predictor.top_outcomes(
+        result["probabilities"], elo_h, elo_a
     )
     return result

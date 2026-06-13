@@ -242,6 +242,12 @@ body {
 .error { color: var(--loss); }
 
 .scoreline { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
+.top-outcomes { margin-top: 0.5rem; font-size: 0.85rem; }
+.top-outcomes-label { color: var(--muted); margin-bottom: 0.25rem; }
+.top-outcomes-list { margin: 0; padding-left: 1.25rem; color: var(--text); }
+.top-outcomes-list li { display: flex; justify-content: space-between; gap: 1rem; max-width: 12rem; }
+.outcome-score { font-variant-numeric: tabular-nums; }
+.outcome-pct { color: var(--muted); font-variant-numeric: tabular-nums; }
 .match-result { font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem; }
 
 @media (max-width: 768px) {

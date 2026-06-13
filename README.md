@@ -120,3 +120,92 @@ List models: `GET /api/models` · Select at runtime: `$env:WC_MODEL_ID = "elo-lo
 |-----|----------|
 | [docs/USAGE.md](./docs/USAGE.md) | Setup checklist, how to run, what each tab shows, troubleshooting |
 | [AGENTS.md](./AGENTS.md) | Agent workspace conventions |
+
+## Deployment
+
+**Recommended split:** FastAPI on [Render](https://render.com) (persistent Python process for model warm-up) + React on [Vercel](https://vercel.com) (static Vite build). Alternatives: Railway (`railway.toml` + `Dockerfile`) or Netlify (`netlify.toml`).
+
+### What ships in git
+
+| Asset | Location | Notes |
+|-------|----------|-------|
+| Trained model | `workspace/artifacts/models/` | `predictor.joblib`, `enriched.joblib`, registry — committed |
+| WC 2026 fixtures | `src/backend/app/data/wc2026_fixtures.json` | committed |
+| Match history CSV | `src/backend/app/data/cache/results.csv` | **gitignored** — fetched at build via `scripts/fetch_data.py` |
+| Backtest report | `workspace/artifacts/backtest_report.json` | **gitignored** — regenerated at build if missing |
+
+`scripts/deploy_prepare.py` runs on deploy: fetch CSV → verify model fingerprint (retrain if upstream data changed) → generate backtest report if needed.
+
+### 1. Push to GitHub
+
+```powershell
+# Create repo on GitHub, then:
+git remote add origin https://github.com/<you>/idea-board.git
+git push -u origin master
+```
+
+### 2. Backend (Render)
+
+1. [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint** → connect repo → apply `render.yaml`.
+2. Set env var **`ALLOWED_ORIGINS`** to your frontend URL (e.g. `https://world-cup-predictor.vercel.app`). Comma-separate multiple origins.
+3. First deploy build takes several minutes (data fetch + model load). Health check: `GET /api/health`.
+4. API docs: `https://<service>.onrender.com/docs`
+
+**Manual Render service** (without Blueprint): Web Service, runtime Python 3.12, build command and start command from `render.yaml`.
+
+**Docker** (Fly.io, Railway, etc.):
+
+```bash
+docker build -t wc-predictor-api .
+docker run -p 8000:8000 -e ALLOWED_ORIGINS=https://your-frontend.vercel.app wc-predictor-api
+```
+
+### 3. Frontend (Vercel)
+
+1. [Vercel](https://vercel.com) → **Add Project** → import GitHub repo.
+2. Framework preset: **Vite**. Root `vercel.json` sets build/output paths.
+3. Set env var **`VITE_API_URL`** = Render backend origin **without** trailing slash, e.g. `https://world-cup-predictor-api.onrender.com`.
+4. Deploy. SPA routing is handled by `vercel.json` rewrites.
+
+**CLI (from repo root):**
+
+```bash
+npx vercel --prod
+# Set VITE_API_URL in Vercel project settings before/after first deploy
+```
+
+**Netlify:** connect repo; `netlify.toml` sets `base = src/frontend` and redirects.
+
+### 4. Verify production
+
+```bash
+curl https://<api-host>/api/health
+curl https://<api-host>/api/backtest/summary
+```
+
+Open the frontend URL — browser devtools should show `200` responses from `VITE_API_URL/api/...` with no CORS errors.
+
+### Environment variables
+
+| Variable | Where | Example |
+|----------|-------|---------|
+| `ALLOWED_ORIGINS` | Backend (Render) | `https://my-app.vercel.app` |
+| `VITE_API_URL` | Frontend (Vercel/Netlify) | `https://my-api.onrender.com` |
+| `WC_MODEL_ID` | Backend (optional) | `elo-logistic-v1` |
+| `PORT` | Backend (set by host) | `10000` (Render injects this) |
+
+### Local production-like test
+
+```powershell
+# Terminal 1 — backend
+cd src/backend
+uv run python scripts/deploy_prepare.py
+$env:ALLOWED_ORIGINS = "http://localhost:4173"
+uvicorn app.main:app --port 8000
+
+# Terminal 2 — frontend
+cd src/frontend
+$env:VITE_API_URL = "http://localhost:8000"
+npm run build
+npm run preview
+```
