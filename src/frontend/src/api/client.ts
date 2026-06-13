@@ -5,22 +5,43 @@ const REQUEST_TIMEOUT_MS = 120_000;
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   if (import.meta.env.PROD && !API_ORIGIN) {
     throw new Error(
-      'VITE_API_URL is not set. Add your Render backend URL in Vercel → Settings → Environment Variables, then redeploy.'
+      'VITE_API_URL is not set. In Vercel → Settings → Environment Variables, set it to your Railway backend URL ' +
+        '(e.g. https://your-app.up.railway.app — no trailing slash, no /api), then redeploy.'
     );
   }
 
+  const url = `${BASE}${path}`;
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const res = await fetch(`${BASE}${path}`, { ...options, signal: controller.signal });
-    if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    const contentType = res.headers.get('content-type') ?? '';
+
+    if (!res.ok) {
+      throw new Error(`API error ${res.status} from ${url}`);
+    }
+
+    if (!contentType.includes('application/json')) {
+      throw new Error(
+        `Expected JSON from ${url} but got ${contentType || 'unknown content-type'}. ` +
+          'Usually VITE_API_URL is missing/wrong or Vercel was not redeployed after setting it. ' +
+          `Current VITE_API_URL: ${API_ORIGIN || '(empty — using /api on Vercel, which returns HTML)'}.`
+      );
+    }
+
     return res.json();
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') {
       throw new Error(
-        `API timed out after ${REQUEST_TIMEOUT_MS / 1000}s (${BASE}${path}). ` +
-          'Render free tier may be waking up — wait 60s and refresh, or check the backend logs.'
+        `API timed out after ${REQUEST_TIMEOUT_MS / 1000}s (${url}). ` +
+          'Backend may be waking up — wait 60s and refresh.'
+      );
+    }
+    if (err instanceof SyntaxError) {
+      throw new Error(
+        `Invalid JSON from ${url}. The server returned HTML instead of JSON — ` +
+          'check VITE_API_URL points to your Railway backend and redeploy Vercel.'
       );
     }
     throw err;
