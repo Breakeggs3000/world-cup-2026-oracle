@@ -1,5 +1,6 @@
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
-const BASE = API_ORIGIN ? `${API_ORIGIN}/api` : '/api';
+const API_VERSION = import.meta.env.VITE_API_VERSION ?? 'v1';
+const BASE = API_ORIGIN ? `${API_ORIGIN}/api/${API_VERSION}` : `/api/${API_VERSION}`;
 const REQUEST_TIMEOUT_MS = 120_000;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {

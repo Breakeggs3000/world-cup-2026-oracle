@@ -84,15 +84,19 @@ Open http://localhost:5173 — Vite proxies `/api` to the backend.
 
 ## API highlights
 
+**Current API version: 1.0.0** — prefer `/api/v1/...` (legacy `/api/...` still works).
+
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/backtest/summary` | Overall and per-WC metrics |
-| `GET /api/tournaments/{year}/matches` | Historical WC matches with predictions |
-| `GET /api/wc2026/fixtures?status=all\|upcoming\|played` | 2026 fixtures + probabilities |
-| `GET /api/predict?home=&away=` | Single match prediction |
-| `POST /api/predict/scenario` | Scenario sliders |
-| `POST /api/simulate/wc2026` | Monte Carlo tournament sim |
-| `GET /api/models` | Model registry (active id + all saved models) |
+| `GET /api/v1/version` | API + active model semver |
+| `GET /api/v1/health` | Health, `api_version`, `active_model_version` |
+| `GET /api/v1/backtest/summary` | Overall and per-WC metrics |
+| `GET /api/v1/tournaments/{year}/matches` | Historical WC matches with predictions |
+| `GET /api/v1/wc2026/fixtures?status=all\|upcoming\|played` | 2026 fixtures + probabilities |
+| `GET /api/v1/predict?home=&away=` | Single match prediction |
+| `POST /api/v1/predict/scenario` | Scenario sliders |
+| `POST /api/v1/simulate/wc2026` | Monte Carlo tournament sim |
+| `GET /api/v1/models` | Model registry (ids + semver versions) |
 
 ## Data sources
 

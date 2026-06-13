@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 from app.services import get_history_df, get_trained_system
 
-router = APIRouter(prefix="/api/predict", tags=["predictions"])
+router = APIRouter(prefix="/predict", tags=["predictions"])
 
 
 class ScenarioRequest(BaseModel):

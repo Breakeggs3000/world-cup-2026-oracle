@@ -14,6 +14,7 @@ from app.data.loader import load_results
 from app.model.artifacts import try_load_active_bundle
 from app.model.backtest import TRAIN_END, build_training_dataset, predict_split, run_backtest
 from app.model.predictor import MatchPredictor
+from app.version import API_VERSION
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 REPORT_PATH = REPO_ROOT / "workspace" / "artifacts" / "backtest_report.json"
@@ -64,9 +65,48 @@ def tournament_match_predictions(year: int) -> list[dict]:
 
 
 def list_available_models() -> dict:
-    from app.model.artifacts import get_active_model_id, list_models
+    from app.model.artifacts import get_active_model_id, get_active_model_version, list_models
 
     return {
+        "api_version": API_VERSION,
         "active_model_id": get_active_model_id(),
+        "active_model_version": get_active_model_version(),
         "models": list_models(),
+    }
+
+
+def get_version_info() -> dict:
+    from app.model.artifacts import get_active_model_id, get_active_model_version, list_models
+    from app.model.versioning import is_compatible_model_version
+    from app.version import API_STATUS
+
+    active_id = get_active_model_id()
+    active_version = get_active_model_version()
+    models = list_models()
+    active_entry = next((m for m in models if m.get("id") == active_id), None)
+
+    return {
+        "api_version": API_VERSION,
+        "api_status": API_STATUS,
+        "preferred_prefix": "/api/v1",
+        "legacy_prefix": "/api",
+        "active_model": {
+            "id": active_id,
+            "version": active_version,
+            "family": active_entry.get("family") if active_entry else None,
+            "compatible_with_api": (
+                is_compatible_model_version(API_VERSION, active_version)
+                if active_version
+                else None
+            ),
+        },
+        "models": [
+            {
+                "id": m.get("id"),
+                "model_version": m.get("model_version"),
+                "family": m.get("family"),
+                "name": m.get("name"),
+            }
+            for m in models
+        ],
     }

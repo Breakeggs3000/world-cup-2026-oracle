@@ -5,7 +5,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import backtest, matches, models, predictions, simulation, wc2026
+from app.api.routes import create_api_router
+from app.version import API_VERSION
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -25,7 +26,7 @@ def _allowed_origins() -> list[str]:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Start accepting requests immediately; model loads lazily on first use."""
-    logger.info("API ready — prediction model loads on first request.")
+    logger.info("API v%s ready — prediction model loads on first request.", API_VERSION)
     yield
 
 
@@ -35,7 +36,23 @@ def _model_is_cached() -> bool:
     return get_trained_system.cache_info().currsize > 0
 
 
-app = FastAPI(title="World Cup 2026 Oracle", version="1.0.0", lifespan=lifespan)
+def _health_payload() -> dict:
+    from app.model.artifacts import get_active_model_id, get_active_model_version
+
+    ready = _model_is_cached()
+    payload: dict = {
+        "status": "ok" if ready else "starting",
+        "api_version": API_VERSION,
+        "model_ready": ready,
+        "active_model_id": get_active_model_id(),
+        "active_model_version": get_active_model_version(),
+    }
+    if not ready:
+        payload["message"] = "Model not loaded yet — first prediction request triggers warmup."
+    return payload
+
+
+app = FastAPI(title="World Cup 2026 Oracle", version=API_VERSION, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,24 +62,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(backtest.router)
-app.include_router(models.router)
-app.include_router(matches.router)
-app.include_router(predictions.router)
-app.include_router(wc2026.router)
-app.include_router(simulation.router)
+_api_router = create_api_router()
+app.include_router(_api_router, prefix="/api/v1")
+# Legacy unversioned paths — same handlers; prefer /api/v1 for new clients.
+app.include_router(_api_router, prefix="/api")
 
 
 @app.get("/api/health")
+@app.get("/api/v1/health")
 def health():
-    from app.model.artifacts import get_active_model_id
-
-    ready = _model_is_cached()
-    payload: dict = {
-        "status": "ok" if ready else "starting",
-        "model_ready": ready,
-        "active_model_id": get_active_model_id(),
-    }
-    if not ready:
-        payload["message"] = "Model not loaded yet — first prediction request triggers warmup."
-    return payload
+    return _health_payload()

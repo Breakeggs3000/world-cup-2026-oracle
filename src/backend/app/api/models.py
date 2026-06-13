@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.services import list_available_models
 
-router = APIRouter(prefix="/api/models", tags=["models"])
+router = APIRouter(prefix="/models", tags=["models"])
 
 
 @router.get("")

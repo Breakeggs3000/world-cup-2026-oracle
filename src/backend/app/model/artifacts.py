@@ -17,6 +17,7 @@ from app.data.loader import RESULTS_CSV
 from app.model.backtest import TRAIN_END, VAL_END, build_training_dataset, _evaluate_fitted_model
 from app.model.elo import EloEngine
 from app.model.predictor import FEATURE_NAMES, MatchPredictor
+from app.version import DEFAULT_MODEL_VERSION
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 MODELS_ROOT = REPO_ROOT / "workspace" / "artifacts" / "models"
@@ -91,10 +92,31 @@ def get_active_model_id() -> str | None:
     return registry.get("active_model_id")
 
 
+def get_active_model_version() -> str | None:
+    registry = load_registry()
+    if registry.get("active_model_version"):
+        return registry["active_model_version"]
+    model_id = registry.get("active_model_id")
+    if not model_id:
+        return None
+    entry = registry.get("models", {}).get(model_id, {})
+    return entry.get("model_version")
+
+
 def load_registry() -> dict[str, Any]:
     if not REGISTRY_PATH.exists():
-        return {"version": 1, "active_model_id": None, "models": {}}
-    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+        return {
+            "schema_version": 1,
+            "api_version": "1.0.0",
+            "active_model_id": None,
+            "active_model_version": None,
+            "models": {},
+        }
+    registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    # Migrate legacy registry shape.
+    if "schema_version" not in registry and "version" in registry:
+        registry["schema_version"] = registry.pop("version")
+    return registry
 
 
 def save_registry(registry: dict[str, Any]) -> None:
@@ -121,6 +143,7 @@ def save_model_bundle(
     hyperparameters: dict[str, Any] | None = None,
     set_active: bool = False,
     notes: str = "",
+    model_version: str | None = None,
 ) -> Path:
     """Write predictor, enriched features, Elo snapshot, metrics, and registry entry."""
     out = model_dir(model_id)
@@ -145,8 +168,10 @@ def save_model_bundle(
     )
 
     fingerprint = compute_data_fingerprint()
+    resolved_version = model_version or DEFAULT_MODEL_VERSION
     metadata = {
         "id": model_id,
+        "model_version": resolved_version,
         "name": name or model_id,
         "family": family,
         "algorithm": algorithm,
@@ -174,8 +199,10 @@ def save_model_bundle(
 
     registry = load_registry()
     registry.setdefault("models", {})[model_id] = metadata
+    registry["api_version"] = registry.get("api_version", "1.0.0")
     if set_active or registry.get("active_model_id") is None:
         registry["active_model_id"] = model_id
+        registry["active_model_version"] = resolved_version
     save_registry(registry)
     return out
 
@@ -228,6 +255,7 @@ def load_model_bundle(model_id: str | None = None) -> ModelBundle:
 def train_and_save_model(
     *,
     model_id: str = DEFAULT_MODEL_ID,
+    model_version: str | None = None,
     set_active: bool = True,
     tags: list[str] | None = None,
     notes: str = "",
@@ -256,6 +284,7 @@ def train_and_save_model(
 
     save_model_bundle(
         model_id=model_id,
+        model_version=model_version,
         predictor=predictor,
         history_df=df,
         enriched=enriched,

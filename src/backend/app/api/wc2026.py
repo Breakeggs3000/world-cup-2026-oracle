@@ -5,7 +5,7 @@ from fastapi import APIRouter, Query
 from app.data.loader import filter_wc2026_fixtures, normalize_team, outcome_label
 from app.services import get_trained_system
 
-router = APIRouter(prefix="/api/wc2026", tags=["wc2026"])
+router = APIRouter(prefix="/wc2026", tags=["wc2026"])
 
 
 def _compute_standings(fixtures: list[dict]) -> dict[str, list[dict]]:

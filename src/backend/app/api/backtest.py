@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.services import get_backtest_report
 
-router = APIRouter(prefix="/api/backtest", tags=["backtest"])
+router = APIRouter(prefix="/backtest", tags=["backtest"])
 
 
 @router.get("/summary")

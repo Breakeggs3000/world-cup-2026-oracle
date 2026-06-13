@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.data.loader import get_world_cup_matches, list_world_cup_years
 from app.services import tournament_match_predictions
 
-router = APIRouter(prefix="/api/tournaments", tags=["tournaments"])
+router = APIRouter(prefix="/tournaments", tags=["tournaments"])
 
 
 @router.get("")

@@ -1,9 +1,12 @@
 {
-  "version": 1,
+  "schema_version": 1,
+  "api_version": "1.0.0",
   "active_model_id": "elo-logistic-v1",
+  "active_model_version": "1.0.0",
   "models": {
     "elo-logistic-v1": {
       "id": "elo-logistic-v1",
+      "model_version": "1.0.0",
       "name": "Elo + Multinomial Logistic (baseline)",
       "family": "elo_logistic",
       "algorithm": "LogisticRegression",

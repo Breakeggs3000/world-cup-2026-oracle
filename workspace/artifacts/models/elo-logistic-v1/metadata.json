@@ -1,5 +1,6 @@
 {
   "id": "elo-logistic-v1",
+  "model_version": "1.0.0",
   "name": "Elo + Multinomial Logistic (baseline)",
   "family": "elo_logistic",
   "algorithm": "LogisticRegression",

@@ -100,7 +100,7 @@ Retraining from scratch on every API cold start is slow (~minutes). Future work 
   - `elo_ratings.json`, `metrics.json`, `metadata.json`
 - Maintain `registry.json` with `active_model_id` and per-model tags, hyperparameters, and data fingerprint
 - API loads active artifact when fingerprint matches `results.csv`; fallback to live training if missing/stale
-- `scripts/train_model.py` trains baseline and registers artifact; `GET /api/models` lists registry
+- `scripts/train_model.py` trains baseline and registers artifact; `GET /api/v1/models` lists registry
 - Runtime override via `WC_MODEL_ID` environment variable
 
 ### Consequences
@@ -108,6 +108,31 @@ Retraining from scratch on every API cold start is slow (~minutes). Future work 
 - First startup after `train_model.py` is fast (seconds vs minutes)
 - Git tracks baseline model artifacts for reproducibility; retrain when data fingerprint changes
 - New model families add a directory + registry entry without changing API surface
+
+---
+
+## ADR-004: Semver for API and model artifacts
+
+**Status:** Accepted  
+**Date:** 2026-06-13
+
+### Context
+
+Live data and new model families will ship incrementally. Clients need stable routes and a clear way to know which model produced a prediction.
+
+### Decision
+
+- **API:** version constant in `app/version.py` (currently **1.0.0**). Routes mounted at `/api/v1/...`; legacy `/api/...` aliases preserved.
+- **Models:** each registry entry carries **`model_version`** semver (currently **1.0.0** for `elo-logistic-v1`). Registry tracks `active_model_version` and `api_version`.
+- **Bump policy:** minor for retrains/same family; major for new families or breaking feature sets; patch for metadata-only fixes.
+- **Discovery:** `GET /api/v1/version` and version fields on `/api/v1/health` and `/api/v1/models`.
+- **CLI:** `train_model.py --bump minor|major|patch` or `--model-version X.Y.Z`.
+
+### Consequences
+
+- Frontend targets `/api/v1` by default (`VITE_API_VERSION` override optional).
+- Breaking API changes require major API bump and optionally `/api/v2`.
+- Model major version should align with API major when feature contracts change.
 
 ---
 

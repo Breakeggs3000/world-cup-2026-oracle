@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 from app.model.simulation import get_trained_predictor, simulate_wc2026
 
-router = APIRouter(prefix="/api/simulate", tags=["simulation"])
+router = APIRouter(prefix="/simulate", tags=["simulation"])
 
 
 class SimulateRequest(BaseModel):
