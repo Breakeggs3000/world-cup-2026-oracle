@@ -1,0 +1,48 @@
+# Agent registry — maps roles to files and default capabilities
+version: 1
+
+defaults:
+  context_paths:
+    - context/project/overview.md
+    - context/architecture/decisions.md
+    - policies/safety.md
+  output_dir: workspace/artifacts
+
+roles:
+  researcher:
+    file: agents/roles/researcher.md
+    description: Explore codebase and external sources; produce findings and recommendations
+    tools:
+      - read_files
+      - search_codebase
+      - web_search
+    outputs:
+      - workspace/artifacts/research/
+      - memory/facts/
+
+  implementer:
+    file: agents/roles/implementer.md
+    description: Implement scoped code changes with minimal diff
+    tools:
+      - read_files
+      - edit_files
+      - run_shell
+      - run_tests
+    outputs:
+      - src/
+      - workspace/artifacts/
+
+  reviewer:
+    file: agents/roles/reviewer.md
+    description: Review changes for correctness, security, and maintainability
+    tools:
+      - read_files
+      - diff
+      - run_tests
+    outputs:
+      - workspace/artifacts/reviews/
+
+crews:
+  default:
+    file: agents/crews/default.yaml
+    description: Research → implement → review pipeline

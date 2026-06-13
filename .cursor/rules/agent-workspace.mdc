@@ -1,0 +1,33 @@
+---
+description: Project workspace layout conventions (per-repo)
+alwaysApply: true
+---
+
+# Agent workspace conventions
+
+Universal git safety and core principles live in user rules (`~/.cursor/rules/`). This rule covers **this repo's layout**.
+
+## Where to work
+
+- **Source code** → `src/`
+- **Drafts and experiments** → `workspace/scratch/` (never commit)
+- **Deliverables** → `workspace/artifacts/`
+- **Durable knowledge** → `context/` or `memory/facts/`
+- **Task specs** → `tasks/backlog/`
+
+## Session start
+
+1. Read `AGENTS.md` if not already loaded.
+2. Read `context/project/overview.md` and relevant `memory/facts/`.
+3. Confirm the active role from `agents/roles/` when doing specialized work.
+
+## Change discipline
+
+- Match existing code style and patterns in `src/`.
+- Keep diffs focused; avoid drive-by refactors.
+- Update `context/architecture/decisions.md` for significant design choices.
+- Record reusable learnings in `memory/facts/` as short markdown notes.
+
+## Stack-specific rules
+
+Add additional `.cursor/rules/*.mdc` files here for your stack (e.g. `**/*.tsx`, `**/*.py`) when you start building in `src/`.

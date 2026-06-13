@@ -1,0 +1,27 @@
+# Default crew — sequential research, implementation, review
+name: default
+description: Standard three-step pipeline for feature work
+
+process: sequential
+
+members:
+  - role: researcher
+    handoff: |
+      Produce a research brief in workspace/artifacts/research/.
+      Include a clear recommendation and acceptance criteria for the implementer.
+
+  - role: implementer
+    handoff: |
+      Implement per the research brief and task spec.
+      Keep changes in src/; record ADRs if needed.
+
+  - role: reviewer
+    handoff: |
+      Review the implementer's diff.
+      Write review to workspace/artifacts/reviews/ with verdict.
+
+shared_context:
+  - AGENTS.md
+  - context/project/overview.md
+  - policies/safety.md
+  - policies/git-workflow.md
