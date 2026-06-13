@@ -233,3 +233,6 @@ workspace/artifacts/backtest_report.json
 src/frontend/node_modules/
 src/frontend/dist/
 node_modules/
+*.tsbuildinfo
+src/frontend/vite.config.js
+src/frontend/vite.config.d.ts
