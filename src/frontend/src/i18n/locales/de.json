@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "WM 2026 Orakel",
+    "language": "Language"
+  },
+  "nav": {
+    "backtest": "Backtest",
+    "history": "Historische WM",
+    "wc2026": "WM 2026",
+    "explorer": "Spiel-Explorer",
+    "simulate": "Turnier-Sim"
+  },
+  "common": {
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "updatedAgo": "Updated {{time}}",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "played": "Played",
+    "sortKickoff": "Kickoff time",
+    "sortDate": "Date",
+    "orderEarliest": "Earliest first",
+    "orderLatest": "Latest first",
+    "group": "Group",
+    "errorLoad": "Failed to load data"
+  },
+  "wc2026": {
+    "title": "World Cup 2026",
+    "subtitle": "Group stage — June 11–July 19, 2026",
+    "predictionsSummary": "Predictions: {{hits}} / {{total}} correct",
+    "standings": "Group standings",
+    "syncSource": "Data: {{source}}"
+  },
+  "disclaimer": {
+    "short": "Nur zur Unterhaltung — keine Wettberatung.",
+    "title": "Nur zur Information",
+    "body": "Diese Seite dient nur der Unterhaltung und Information. Vorhersagen sind statistische Schätzungen, keine Wettberatung.",
+    "accept": "Verstanden"
+  }
+}

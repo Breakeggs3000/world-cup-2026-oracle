@@ -36,6 +36,7 @@ def tournament_matches(year: int):
             }
         )
 
+    matches.sort(key=lambda m: m["date"])
     correct = sum(1 for m in matches if m.get("correct"))
     return {
         "year": year,

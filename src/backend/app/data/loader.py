@@ -9,6 +9,8 @@ from typing import Any
 
 import pandas as pd
 
+from app.data import store
+
 DATA_DIR = Path(__file__).resolve().parent
 CACHE_DIR = DATA_DIR / "cache"
 RESULTS_CSV = CACHE_DIR / "results.csv"
@@ -119,28 +121,62 @@ def list_world_cup_years() -> list[int]:
     return [y for y in years if y >= 1990]
 
 
-def load_wc2026_fixtures() -> list[dict[str, Any]]:
-    with WC2026_PATH.open(encoding="utf-8") as f:
+def load_wc2026_fixtures_from_json(path: Path | None = None) -> list[dict[str, Any]]:
+    json_path = path or WC2026_PATH
+    with json_path.open(encoding="utf-8") as f:
         data = json.load(f)
     fixtures = data["fixtures"] if isinstance(data, dict) and "fixtures" in data else data
+    normalized: list[dict[str, Any]] = []
     for fx in fixtures:
-        fx["home_team"] = normalize_team(fx.get("home_team"))
-        fx["away_team"] = normalize_team(fx.get("away_team"))
+        item = dict(fx)
+        item["home_team"] = normalize_team(fx.get("home_team"))
+        item["away_team"] = normalize_team(fx.get("away_team"))
         stage = str(fx.get("stage", "Group"))
-        fx["stage"] = "Group" if stage.lower() == "group" else stage
-        if "status" not in fx:
-            if fx.get("home_score") is not None:
-                fx["status"] = "played"
-            else:
-                fx["status"] = "upcoming"
-    return fixtures
+        item["stage"] = "Group" if stage.lower() == "group" else stage
+        if "status" not in item:
+            item["status"] = "played" if fx.get("home_score") is not None else "upcoming"
+        normalized.append(item)
+    return normalized
 
 
-def filter_wc2026_fixtures(status: str = "all") -> list[dict[str, Any]]:
-    fixtures = load_wc2026_fixtures()
-    if status == "all":
-        return fixtures
-    return [f for f in fixtures if f.get("status") == status]
+def clear_wc2026_cache() -> None:
+    load_wc2026_fixtures.cache_clear()
+
+
+@lru_cache(maxsize=1)
+def load_wc2026_fixtures() -> list[dict[str, Any]]:
+    try:
+        if store.fixture_count() > 0:
+            return store.query_fixtures(status="all", sort="datetime", order="asc")
+    except Exception:
+        pass
+    return load_wc2026_fixtures_from_json()
+
+
+def filter_wc2026_fixtures(
+    status: str = "all",
+    *,
+    group: str | None = None,
+    stage: str | None = None,
+    sort: str = "datetime",
+    order: str = "asc",
+) -> list[dict[str, Any]]:
+    try:
+        if store.fixture_count() > 0:
+            return store.query_fixtures(
+                status=status, group=group, stage=stage, sort=sort, order=order
+            )
+    except Exception:
+        pass
+    fixtures = load_wc2026_fixtures_from_json()
+    if status != "all":
+        fixtures = [f for f in fixtures if f.get("status") == status]
+    if group:
+        fixtures = [f for f in fixtures if str(f.get("group", "")).upper() == group.upper()]
+    if stage:
+        fixtures = [f for f in fixtures if f.get("stage") == stage]
+    key = lambda f: f.get(sort) or f.get("date") or ""
+    return sorted(fixtures, key=key, reverse=(order == "desc"))
 
 
 def get_team_confederation(team: str) -> str | None:

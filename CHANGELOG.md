@@ -30,3 +30,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Sem
 - **Repository:** https://github.com/Breakeggs3000/world-cup-2026-oracle
 
 [1.0.0]: https://github.com/Breakeggs3000/world-cup-2026-oracle/releases/tag/v1.0.0
+
+## [1.1.0] - 2026-06-13
+
+### Added
+
+- Live fixture sync via API-Football (primary) with optional LiveSoccerTV HTML fallback
+- SQLite fixture store with 10-minute background sync (APScheduler)
+- `GET /api/v1/sync/status`, `POST /api/v1/sync/run` (optional secret)
+- WC 2026 sort/filter: `sort=datetime|date`, `order=asc|desc`, group filter (default earliest first)
+- Frontend 60s polling on WC 2026 tab + manual refresh
+- 15-language UI (i18next): en, zh, ko, ja, de, pt, es, fr, ar, hi, ru, it, tr, id, vi
+- Betting/informational disclaimer banner + first-visit modal
+- `.cursorignore` for leaner IDE context
+
+### Changed
+
+- API version **1.1.0** (model remains **1.0.0**)
+- WC fixtures served from SQLite when available; JSON seed as bootstrap
+
+[1.1.0]: https://github.com/Breakeggs3000/world-cup-2026-oracle/releases/tag/v1.1.0

@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "Oráculo WC 2026",
+    "language": "Language"
+  },
+  "nav": {
+    "backtest": "Backtest",
+    "history": "Mundiales",
+    "wc2026": "WC 2026",
+    "explorer": "Explorador",
+    "simulate": "Simulación"
+  },
+  "common": {
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "updatedAgo": "Updated {{time}}",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "played": "Played",
+    "sortKickoff": "Kickoff time",
+    "sortDate": "Date",
+    "orderEarliest": "Earliest first",
+    "orderLatest": "Latest first",
+    "group": "Group",
+    "errorLoad": "Failed to load data"
+  },
+  "wc2026": {
+    "title": "World Cup 2026",
+    "subtitle": "Group stage — June 11–July 19, 2026",
+    "predictionsSummary": "Predictions: {{hits}} / {{total}} correct",
+    "standings": "Group standings",
+    "syncSource": "Data: {{source}}"
+  },
+  "disclaimer": {
+    "short": "Solo entretenimiento — no es consejo de apuestas.",
+    "title": "Uso informativo",
+    "body": "Este sitio es solo para entretenimiento e información. Las predicciones son estimaciones estadísticas, no consejos de apuestas.",
+    "accept": "Entiendo"
+  }
+}

@@ -124,6 +124,10 @@ Open the frontend URL in a browser. In DevTools → Network, requests to `https:
 | `ALLOWED_ORIGINS` | Render / Railway | Yes (prod) | `https://world-cup-2026-oracle.vercel.app` |
 | `WC_MODEL_ID` | Backend | No | `elo-logistic-v1` |
 | `PORT` | Backend | Auto (host) | Render injects this |
+| `API_FOOTBALL_KEY` | Railway backend | Yes (live scores) | Set in dashboard only — never commit |
+| `SYNC_INTERVAL_MINUTES` | Railway backend | No | `10` |
+| `FIXTURES_DB_PATH` | Railway backend | No | `/data/fixtures.db` with volume at `/data` |
+| `LIVESOCCERTV_FALLBACK` | Railway backend | No | `0` (set `1` for HTML fallback) |
 
 For multiple frontends (preview + prod), comma-separate origins:
 

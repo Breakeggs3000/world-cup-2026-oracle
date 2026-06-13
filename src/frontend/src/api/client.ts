@@ -90,6 +90,7 @@ export interface ScoreOutcome {
 export interface Wc2026Fixture {
   id: string;
   date: string;
+  datetime?: string;
   home_team: string;
   away_team: string;
   stage: string;
@@ -107,6 +108,15 @@ export interface Wc2026Fixture {
   prediction_correct?: boolean;
 }
 
+export interface Wc2026FixturesResponse {
+  fixtures: Wc2026Fixture[];
+  count: number;
+  sort: string;
+  order: string;
+  last_synced_at?: string;
+  data_source?: string;
+}
+
 export const api = {
   getBacktestSummary: () => request<BacktestSummary>('/backtest/summary'),
   getTournamentYears: () => request<{ years: number[] }>('/tournaments'),
@@ -114,8 +124,17 @@ export const api = {
     request<{ year: number; matches: MatchPrediction[]; summary: { total: number; correct: number; accuracy: number } }>(
       `/tournaments/${year}/matches`
     ),
-  getWc2026Fixtures: (status: string = 'all') =>
-    request<{ fixtures: Wc2026Fixture[]; count: number }>(`/wc2026/fixtures?status=${status}`),
+  getWc2026Fixtures: (
+    status: string = 'all',
+    opts?: { sort?: string; order?: string; group?: string }
+  ) => {
+    const params = new URLSearchParams({ status });
+    if (opts?.sort) params.set('sort', opts.sort);
+    if (opts?.order) params.set('order', opts.order);
+    if (opts?.group) params.set('group', opts.group);
+    return request<Wc2026FixturesResponse>(`/wc2026/fixtures?${params.toString()}`);
+  },
+  getSyncStatus: () => request<Record<string, unknown>>('/sync/status'),
   getWc2026Standings: () => request<{ standings: Record<string, Array<Record<string, number | string>>> }>('/wc2026/standings'),
   predict: (home: string, away: string, neutral = true) =>
     request<Record<string, unknown>>(`/predict?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}&neutral=${neutral}`),

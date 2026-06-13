@@ -136,6 +136,31 @@ Live data and new model families will ship incrementally. Clients need stable ro
 
 ---
 
+## ADR-005: Live fixture sync (API-Football + SQLite)
+
+**Status:** Accepted  
+**Date:** 2026-06-13
+
+### Context
+
+WC 2026 scores were manually edited in JSON. v1.1 needs periodic updates without redeploy.
+
+### Decision
+
+- SQLite store at `FIXTURES_DB_PATH` (Railway volume `/data/fixtures.db`)
+- Primary provider: API-Football (`API_FOOTBALL_KEY`)
+- Fallback: LiveSoccerTV HTML parsing when `LIVESOCCERTV_FALLBACK=1` and API fails
+- APScheduler interval sync (default 10 min); seed from JSON when DB empty
+- API exposes `GET /api/v1/sync/status`; model version unchanged at 1.0.0
+
+### Consequences
+
+- Railway needs volume mount + API key in env
+- Scraping fallback is brittle; prefer API-Football
+- API semver bumped to **1.1.0**; model semver unchanged
+
+---
+
 ## Template for new ADRs
 
 ```markdown

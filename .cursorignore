@@ -1,0 +1,12 @@
+﻿node_modules/
+src/frontend/dist/
+src/frontend/node_modules/
+src/backend/.venv/
+src/backend/app/data/cache/
+workspace/scratch/
+workspace/sessions/
+logs*.json
+**/*.joblib
+**/*.csv
+uv.lock
+src/backend/.pytest_cache/

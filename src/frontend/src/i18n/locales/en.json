@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "WC 2026 Oracle",
+    "language": "Language"
+  },
+  "nav": {
+    "backtest": "Backtest",
+    "history": "Historical WC",
+    "wc2026": "WC 2026",
+    "explorer": "Match Explorer",
+    "simulate": "Tournament Sim"
+  },
+  "common": {
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "updatedAgo": "Updated {{time}}",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "played": "Played",
+    "sortKickoff": "Kickoff time",
+    "sortDate": "Date",
+    "orderEarliest": "Earliest first",
+    "orderLatest": "Latest first",
+    "group": "Group",
+    "errorLoad": "Failed to load data"
+  },
+  "wc2026": {
+    "title": "World Cup 2026",
+    "subtitle": "Group stage — June 11–July 19, 2026",
+    "predictionsSummary": "Predictions: {{hits}} / {{total}} correct",
+    "standings": "Group standings",
+    "syncSource": "Data: {{source}}"
+  },
+  "disclaimer": {
+    "short": "For entertainment only — not betting advice.",
+    "title": "Informational use only",
+    "body": "This site is for entertainment and informational purposes only. Predictions are statistical estimates, not betting advice. We are not responsible for decisions or losses based on these results. If you choose to gamble, do so legally and responsibly.",
+    "accept": "I understand"
+  }
+}

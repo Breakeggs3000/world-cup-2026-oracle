@@ -24,7 +24,7 @@ def test_health_includes_api_version(client):
         res = client.get(path)
         assert res.status_code == 200
         body = res.json()
-        assert body["api_version"] == "1.0.0"
+        assert body["api_version"] == "1.1.0"
         assert body["active_model_version"] == "1.0.0"
 
 
@@ -32,7 +32,7 @@ def test_version_endpoint(client):
     res = client.get("/api/v1/version")
     assert res.status_code == 200
     body = res.json()
-    assert body["api_version"] == "1.0.0"
+    assert body["api_version"] == "1.1.0"
     assert body["preferred_prefix"] == "/api/v1"
     assert body["active_model"]["version"] == "1.0.0"
 
@@ -40,4 +40,4 @@ def test_version_endpoint(client):
 def test_legacy_api_alias(client):
     res = client.get("/api/models")
     assert res.status_code == 200
-    assert res.json()["api_version"] == "1.0.0"
+    assert res.json()["api_version"] == "1.1.0"

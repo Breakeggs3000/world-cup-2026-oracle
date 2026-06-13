@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "2026世界杯预言",
+    "language": "Language"
+  },
+  "nav": {
+    "backtest": "回测",
+    "history": "历史世界杯",
+    "wc2026": "2026世界杯",
+    "explorer": "比赛探索",
+    "simulate": "赛事模拟"
+  },
+  "common": {
+    "loading": "Loading…",
+    "refresh": "刷新",
+    "updatedAgo": "Updated {{time}}",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "played": "Played",
+    "sortKickoff": "Kickoff time",
+    "sortDate": "Date",
+    "orderEarliest": "Earliest first",
+    "orderLatest": "Latest first",
+    "group": "Group",
+    "errorLoad": "Failed to load data"
+  },
+  "wc2026": {
+    "title": "2026世界杯",
+    "subtitle": "Group stage — June 11–July 19, 2026",
+    "predictionsSummary": "Predictions: {{hits}} / {{total}} correct",
+    "standings": "Group standings",
+    "syncSource": "Data: {{source}}"
+  },
+  "disclaimer": {
+    "short": "仅供娱乐，非投注建议。",
+    "title": "仅供参考",
+    "body": "本网站仅供娱乐和信息参考。预测为统计估算，非投注建议。我们不对基于本网站结果的决定或损失负责。",
+    "accept": "我知道了"
+  }
+}

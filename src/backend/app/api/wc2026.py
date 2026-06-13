@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query
 
 from app.data.loader import filter_wc2026_fixtures, normalize_team, outcome_label
 from app.services import get_trained_system
+from app.sync.service import sync_status
 
 router = APIRouter(prefix="/wc2026", tags=["wc2026"])
 
@@ -45,10 +46,17 @@ def _compute_standings(fixtures: list[dict]) -> dict[str, list[dict]]:
 
 
 @router.get("/fixtures")
-def wc2026_fixtures(status: str = Query("all", pattern="^(all|upcoming|played)$")):
+def wc2026_fixtures(
+    status: str = Query("all", pattern="^(all|upcoming|played)$"),
+    sort: str = Query("datetime", pattern="^(datetime|date)$"),
+    order: str = Query("asc", pattern="^(asc|desc)$"),
+    group: str | None = Query(None, min_length=1, max_length=2),
+    stage: str | None = None,
+):
     import pandas as pd
 
-    fixtures = filter_wc2026_fixtures(status)
+    fixtures = filter_wc2026_fixtures(status, group=group, stage=stage, sort=sort, order=order)
+    meta = sync_status()
     predictor, df, _ = get_trained_system()
 
     from app.model.elo import EloEngine
@@ -84,10 +92,18 @@ def wc2026_fixtures(status: str = Query("all", pattern="^(all|upcoming|played)$"
                 item["prediction_correct"] = pred["predicted_outcome"] == actual
         enriched.append(item)
 
-    return {"fixtures": enriched, "count": len(enriched)}
+    last = meta.get("last_sync") or {}
+    return {
+        "fixtures": enriched,
+        "count": len(enriched),
+        "sort": sort,
+        "order": order,
+        "last_synced_at": last.get("finished_at") or last.get("started_at"),
+        "data_source": meta.get("data_source", "seed"),
+    }
 
 
 @router.get("/standings")
 def wc2026_standings():
-    fixtures = filter_wc2026_fixtures("all")
+    fixtures = filter_wc2026_fixtures("all", sort="datetime", order="asc")
     return {"standings": _compute_standings(fixtures)}

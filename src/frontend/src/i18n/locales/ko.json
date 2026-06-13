@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "2026 WC 오라클",
+    "language": "Language"
+  },
+  "nav": {
+    "backtest": "백테스트",
+    "history": "역대 WC",
+    "wc2026": "2026 WC",
+    "explorer": "경기 탐색",
+    "simulate": "토너먼트 시뮬"
+  },
+  "common": {
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "updatedAgo": "Updated {{time}}",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "played": "Played",
+    "sortKickoff": "Kickoff time",
+    "sortDate": "Date",
+    "orderEarliest": "Earliest first",
+    "orderLatest": "Latest first",
+    "group": "Group",
+    "errorLoad": "Failed to load data"
+  },
+  "wc2026": {
+    "title": "World Cup 2026",
+    "subtitle": "Group stage — June 11–July 19, 2026",
+    "predictionsSummary": "Predictions: {{hits}} / {{total}} correct",
+    "standings": "Group standings",
+    "syncSource": "Data: {{source}}"
+  },
+  "disclaimer": {
+    "short": "오락용입니다 — 베팅 조언이 아닙니다.",
+    "title": "정보 제공 목적",
+    "body": "본 사이트는 오락 및 정보 제공 목적입니다. 예측은 통계적 추정치이며 베팅 조언이 아닙니다.",
+    "accept": "이해했습니다"
+  }
+}

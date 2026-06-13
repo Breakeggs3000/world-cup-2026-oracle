@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-API_VERSION = "1.0.0"
+API_VERSION = "1.1.0"
 API_STATUS = "stable"  # stable | beta | deprecated
 
 DEFAULT_MODEL_VERSION = "1.0.0"

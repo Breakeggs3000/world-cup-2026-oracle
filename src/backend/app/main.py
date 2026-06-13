@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import create_api_router
+from app.sync.scheduler import start_sync_scheduler, stop_sync_scheduler
+from app.sync.service import run_sync
 from app.version import API_VERSION
 
 logger = logging.getLogger("uvicorn.error")
@@ -27,7 +29,13 @@ def _allowed_origins() -> list[str]:
 async def lifespan(app: FastAPI):
     """Start accepting requests immediately; model loads lazily on first use."""
     logger.info("API v%s ready — prediction model loads on first request.", API_VERSION)
+    try:
+        run_sync()
+    except Exception as exc:
+        logger.warning("Initial fixture sync skipped: %s", exc)
+    start_sync_scheduler()
     yield
+    stop_sync_scheduler()
 
 
 def _model_is_cached() -> bool:

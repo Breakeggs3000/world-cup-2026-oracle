@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "WC 2026 オラクル",
+    "language": "Language"
+  },
+  "nav": {
+    "backtest": "バックテスト",
+    "history": "歴代WC",
+    "wc2026": "WC 2026",
+    "explorer": "試合探索",
+    "simulate": "トーナメント"
+  },
+  "common": {
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "updatedAgo": "Updated {{time}}",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "played": "Played",
+    "sortKickoff": "Kickoff time",
+    "sortDate": "Date",
+    "orderEarliest": "Earliest first",
+    "orderLatest": "Latest first",
+    "group": "Group",
+    "errorLoad": "Failed to load data"
+  },
+  "wc2026": {
+    "title": "World Cup 2026",
+    "subtitle": "Group stage — June 11–July 19, 2026",
+    "predictionsSummary": "Predictions: {{hits}} / {{total}} correct",
+    "standings": "Group standings",
+    "syncSource": "Data: {{source}}"
+  },
+  "disclaimer": {
+    "short": "娯楽目的のみ — 賭博助言ではありません。",
+    "title": "情報提供のみ",
+    "body": "本サイトは娯楽および情報提供を目的としています。予測は統計的推定であり、賭博助言ではありません。",
+    "accept": "理解しました"
+  }
+}

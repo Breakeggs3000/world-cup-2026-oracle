@@ -219,6 +219,7 @@ __marimo__/
 
 # Agent workspace — ephemeral agent working files
 logs*.json
+workspace/artifacts/fixtures.db
 workspace/scratch/*
 !workspace/scratch/.gitkeep
 workspace/sessions/

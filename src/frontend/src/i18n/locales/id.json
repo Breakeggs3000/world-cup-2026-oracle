@@ -1,0 +1,40 @@
+{
+  "app": {
+    "title": "Oracle WC 2026",
+    "language": "Language"
+  },
+  "nav": {
+    "backtest": "Backtest",
+    "history": "WC Historis",
+    "wc2026": "WC 2026",
+    "explorer": "Penjelajah",
+    "simulate": "Simulasi"
+  },
+  "common": {
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "updatedAgo": "Updated {{time}}",
+    "all": "All",
+    "upcoming": "Upcoming",
+    "played": "Played",
+    "sortKickoff": "Kickoff time",
+    "sortDate": "Date",
+    "orderEarliest": "Earliest first",
+    "orderLatest": "Latest first",
+    "group": "Group",
+    "errorLoad": "Failed to load data"
+  },
+  "wc2026": {
+    "title": "World Cup 2026",
+    "subtitle": "Group stage — June 11–July 19, 2026",
+    "predictionsSummary": "Predictions: {{hits}} / {{total}} correct",
+    "standings": "Group standings",
+    "syncSource": "Data: {{source}}"
+  },
+  "disclaimer": {
+    "short": "Hiburan saja — bukan saran taruhan.",
+    "title": "Informatif",
+    "body": "Situs ini hanya untuk hiburan dan informasi.",
+    "accept": "Mengerti"
+  }
+}
