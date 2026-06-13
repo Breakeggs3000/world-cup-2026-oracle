@@ -35,7 +35,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Sem
 
 ### Added
 
-- Live fixture sync via API-Football (primary) with optional LiveSoccerTV HTML fallback
+- Live fixture sync via API-Football (primary) with optional DuckDuckGo HTML search fallback (`WEB_SEARCH_FALLBACK=1`)
 - SQLite fixture store with 10-minute background sync (APScheduler)
 - `GET /api/v1/sync/status`, `POST /api/v1/sync/run` (optional secret)
 - WC 2026 sort/filter: `sort=datetime|date`, `order=asc|desc`, group filter (default earliest first)
