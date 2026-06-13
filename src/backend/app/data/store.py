@@ -62,6 +62,8 @@ def init_db(db_path: str | None = None) -> None:
 
 
 def upsert_fixtures(fixtures: list[dict[str, Any]], db_path: str | None = None) -> int:
+    from app.data.loader import normalize_stage, normalize_team
+
     init_db(db_path)
     now = datetime.now(timezone.utc).isoformat()
     count = 0
@@ -94,9 +96,9 @@ def upsert_fixtures(fixtures: list[dict[str, Any]], db_path: str | None = None) 
                     fx.get("external_id"),
                     fx["date"],
                     fx.get("datetime"),
-                    fx["home_team"],
-                    fx["away_team"],
-                    fx.get("stage", "Group"),
+                    normalize_team(fx["home_team"]),
+                    normalize_team(fx["away_team"]),
+                    normalize_stage(fx.get("stage", "Group")),
                     fx.get("group"),
                     fx.get("venue", ""),
                     1 if fx.get("neutral", True) else 0,
@@ -112,13 +114,15 @@ def upsert_fixtures(fixtures: list[dict[str, Any]], db_path: str | None = None) 
 
 
 def row_to_fixture(row: sqlite3.Row) -> dict[str, Any]:
+    from app.data.loader import normalize_stage
+
     item = {
         "id": row["id"],
         "date": row["date"],
         "datetime": row["datetime"],
         "home_team": row["home_team"],
         "away_team": row["away_team"],
-        "stage": row["stage"],
+        "stage": normalize_stage(row["stage"]),
         "group": row["group_code"],
         "venue": row["venue"],
         "neutral": bool(row["neutral"]),
@@ -212,6 +216,7 @@ def last_sync_status(db_path: str | None = None) -> dict[str, Any] | None:
 
 
 def seed_from_json(json_path: Path, db_path: str | None = None) -> int:
-    data = json.loads(json_path.read_text(encoding="utf-8"))
-    fixtures = data["fixtures"] if isinstance(data, dict) else data
+    from app.data.loader import load_wc2026_fixtures_from_json
+
+    fixtures = load_wc2026_fixtures_from_json(json_path)
     return upsert_fixtures(fixtures, db_path=db_path)

@@ -9,13 +9,13 @@ from app.data import store
 from app.data.loader import WC2026_PATH, clear_wc2026_cache
 from app.data.providers.api_football import ApiFootballProvider
 from app.data.providers.base import run_provider_chain
-from app.data.providers.livesoccer_tv import LiveSoccerTvProvider
+from app.data.providers.duckduckgo_search import DuckDuckGoSearchProvider
 
 
 def build_providers(*, allow_fallback: bool = True) -> list:
     providers: list = [ApiFootballProvider()]
-    if allow_fallback and os.environ.get("LIVESOCCERTV_FALLBACK", "0") in ("1", "true", "yes"):
-        providers.append(LiveSoccerTvProvider())
+    if allow_fallback and os.environ.get("WEB_SEARCH_FALLBACK", "0") in ("1", "true", "yes"):
+        providers.append(DuckDuckGoSearchProvider())
     return providers
 
 

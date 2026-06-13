@@ -149,7 +149,7 @@ WC 2026 scores were manually edited in JSON. v1.1 needs periodic updates without
 
 - SQLite store at `FIXTURES_DB_PATH` (Railway volume `/data/fixtures.db`)
 - Primary provider: API-Football (`API_FOOTBALL_KEY`)
-- Fallback: LiveSoccerTV HTML parsing when `LIVESOCCERTV_FALLBACK=1` and API fails
+- Fallback: DuckDuckGo HTML search when `WEB_SEARCH_FALLBACK=1` and API-Football fails (updates scores on known fixtures only)
 - APScheduler interval sync (default 10 min); seed from JSON when DB empty
 - API exposes `GET /api/v1/sync/status`; model version unchanged at 1.0.0
 

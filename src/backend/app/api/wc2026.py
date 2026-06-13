@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from fastapi import APIRouter, Query
 
-from app.data.loader import filter_wc2026_fixtures, normalize_team, outcome_label
+from app.data.loader import filter_wc2026_fixtures, is_group_stage, normalize_team, outcome_label
 from app.services import get_trained_system
 from app.sync.service import sync_status
 
@@ -69,13 +69,14 @@ def wc2026_fixtures(
         item = dict(fx)
         home = normalize_team(fx["home_team"])
         away = normalize_team(fx["away_team"])
-        if home != "TBD" and away != "TBD" and fx.get("stage") == "Group":
+        if home and away and home != "TBD" and away != "TBD":
             pred = predictor.predict_match(
                 home,
                 away,
                 pd.Timestamp(fx["date"]),
                 df,
                 neutral=fx.get("neutral", True),
+                is_knockout=not is_group_stage(fx.get("stage")),
                 elo_engine=elo_engine,
             )
             item["probabilities"] = pred["probabilities"]

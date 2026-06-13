@@ -18,13 +18,13 @@ export function MatchCard({ match }: { match: Wc2026Fixture }) {
         <span className="team away">{match.away_team}</span>
       </div>
       {match.probabilities && (
-        <ProbabilityBar probs={match.probabilities} label="Prediction" />
+        <ProbabilityBar probs={match.probabilities} label="W / D / L probabilities" />
       )}
       {match.likely_scoreline && (
         <div className="scoreline">Most likely: {match.likely_scoreline}</div>
       )}
       {match.top_outcomes && match.top_outcomes.length > 0 && (
-        <TopOutcomes outcomes={match.top_outcomes} />
+        <TopOutcomes outcomes={match.top_outcomes} label="Top 5 scorelines" />
       )}
       {played && match.prediction_correct !== undefined && (
         <span className={`badge ${match.prediction_correct ? 'hit' : 'miss'}`}>

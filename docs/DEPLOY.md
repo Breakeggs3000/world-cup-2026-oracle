@@ -120,16 +120,14 @@ Open the frontend URL in a browser. In DevTools → Network, requests to `https:
 
 | Variable | Where | Required | Example |
 |----------|-------|----------|---------|
-| `VITE_API_URL` | Vercel / Netlify | Yes (prod) | `https://world-cup-2026-oracle-production.up.railway.app` (or use committed `src/frontend/.env.production`) |
-| `ALLOWED_ORIGINS` | Render / Railway | Optional | `https://world-cup-2026-oracle.vercel.app` (also in backend default origins) |
+| `VITE_API_URL` | Vercel / Netlify | Yes (prod) | `https://world-cup-2026-oracle-api.onrender.com` |
+| `ALLOWED_ORIGINS` | Render / Railway | Yes (prod) | `https://world-cup-2026-oracle.vercel.app` |
 | `WC_MODEL_ID` | Backend | No | `elo-logistic-v1` |
 | `PORT` | Backend | Auto (host) | Render injects this |
 | `API_FOOTBALL_KEY` | Railway backend | Yes (live scores) | Set in dashboard only — never commit |
 | `SYNC_INTERVAL_MINUTES` | Railway backend | No | `10` |
 | `FIXTURES_DB_PATH` | Railway backend | No | `/data/fixtures.db` with volume at `/data` |
-| `LIVESOCCERTV_FALLBACK` | Railway backend | No | `0` (set `1` for HTML fallback) |
-
-**API-Football free plan:** cannot fetch WC 2026 season data (error: seasons limited to 2022–2024). The app falls back to seed JSON (77 fixtures). Upgrade the API-Football plan for live scores, or keep seed data for demo.
+| `WEB_SEARCH_FALLBACK` | Railway backend | No | `0` (set `1` for DuckDuckGo HTML score fallback when API-Football fails) |
 
 For multiple frontends (preview + prod), comma-separate origins:
 

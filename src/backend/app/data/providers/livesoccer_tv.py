@@ -1,15 +1,14 @@
-"""LiveSoccerTV HTML fallback — updates scores on known fixtures only."""
+"""LiveSoccerTV HTML fallback (deprecated — use duckduckgo_search instead)."""
 
 from __future__ import annotations
 
 import os
-import re
 from typing import Any
 
 import httpx
 
 from app.data import store
-from app.data.loader import normalize_team
+from app.data.providers.score_html import apply_score_updates, parse_score_updates
 
 URL = "https://www.livesoccertv.com/competitions/world-cup/"
 
@@ -39,34 +38,8 @@ class LiveSoccerTvProvider:
             response.raise_for_status()
             html = response.text
 
-        score_pattern = re.compile(
-            r"(\w[\w\s\.]+?)\s+(\d+)\s*[-–]\s*(\d+)\s+(\w[\w\s\.]+)",
-            re.IGNORECASE,
-        )
-        updates: dict[tuple[str, str], tuple[int, int]] = {}
-        for match in score_pattern.finditer(html):
-            home = normalize_team(match.group(1).strip())
-            away = normalize_team(match.group(4).strip())
-            if home and away:
-                updates[(home, away)] = (int(match.group(2)), int(match.group(3)))
-
+        updates = parse_score_updates(html)
         if not updates:
             raise RuntimeError("No scores parsed from LiveSoccerTV")
 
-        updated: list[dict[str, Any]] = []
-        for fx in existing:
-            item = dict(fx)
-            key = (fx["home_team"], fx["away_team"])
-            rev = (fx["away_team"], fx["home_team"])
-            if key in updates:
-                hs, aws = updates[key]
-            elif rev in updates:
-                aws, hs = updates[rev]
-            else:
-                updated.append(item)
-                continue
-            item["home_score"] = hs
-            item["away_score"] = aws
-            item["status"] = "played"
-            updated.append(item)
-        return updated
+        return apply_score_updates(existing, updates)

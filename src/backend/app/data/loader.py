@@ -40,6 +40,17 @@ def normalize_team(name: str | None) -> str:
     return load_aliases().get(cleaned, cleaned)
 
 
+def normalize_stage(stage: str | None) -> str:
+    if not stage or not str(stage).strip():
+        return "Group"
+    text = str(stage).strip()
+    return "Group" if text.lower() == "group" else text
+
+
+def is_group_stage(stage: str | None) -> bool:
+    return normalize_stage(stage) == "Group"
+
+
 @lru_cache(maxsize=1)
 def _load_results_cached() -> pd.DataFrame:
     if not RESULTS_CSV.exists():
@@ -131,8 +142,7 @@ def load_wc2026_fixtures_from_json(path: Path | None = None) -> list[dict[str, A
         item = dict(fx)
         item["home_team"] = normalize_team(fx.get("home_team"))
         item["away_team"] = normalize_team(fx.get("away_team"))
-        stage = str(fx.get("stage", "Group"))
-        item["stage"] = "Group" if stage.lower() == "group" else stage
+        item["stage"] = normalize_stage(fx.get("stage", "Group"))
         if "status" not in item:
             item["status"] = "played" if fx.get("home_score") is not None else "upcoming"
         normalized.append(item)
