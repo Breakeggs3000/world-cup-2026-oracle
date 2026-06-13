@@ -12,7 +12,11 @@ from app.version import API_VERSION
 
 logger = logging.getLogger("uvicorn.error")
 
-_DEFAULT_ORIGINS = ("http://localhost:5173", "http://127.0.0.1:5173")
+_DEFAULT_ORIGINS = (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://world-cup-2026-oracle.vercel.app",
+)
 
 
 def _allowed_origins() -> list[str]:
