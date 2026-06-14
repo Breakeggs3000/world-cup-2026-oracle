@@ -1,7 +1,7 @@
 [project]
 name = "world-cup-2026-oracle-backend"
 version = "1.0.0"
-description = "World Cup predictor backend (Elo + logistic model)"
+description = "World Cup 2026 Oracle backend (Elo + logistic model)"
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "fastapi>=0.110.0",

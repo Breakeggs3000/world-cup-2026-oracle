@@ -1,4 +1,4 @@
-# Task: World Cup Predictor
+# Task: World Cup 2026 Oracle
 
 **Status:** Done  
 **Created:** 2026-06-13

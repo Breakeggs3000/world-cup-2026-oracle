@@ -58,14 +58,14 @@ Multiple vibe-coding experiments in one repo pollute `context/`, `memory/`, and 
 
 ---
 
-## ADR-002: World Cup predictor stack
+## ADR-002: World Cup 2026 Oracle stack
 
 **Status:** Accepted  
 **Date:** 2026-06-13
 
 ### Context
 
-The project pivoted from a generic idea board to a football prediction app requiring ML backtesting, an API, and an interactive UI.
+The project evolved from the pilot101 agent-workspace template into World Cup 2026 Oracle — a football prediction app requiring ML backtesting, an API, and an interactive UI.
 
 ### Decision
 

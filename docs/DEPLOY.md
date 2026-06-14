@@ -15,10 +15,10 @@ Recommended layout:
 
 ## 1. Push code to GitHub
 
-From your local clone (folder may still be named `idea-board` — that is fine):
+From your local clone:
 
 ```powershell
-cd path\to\idea-board
+cd path\to\world-cup-2026-oracle
 git remote add origin https://github.com/Breakeggs3000/world-cup-2026-oracle.git
 git push -u origin master
 ```
