@@ -4,6 +4,122 @@ Predict international football match outcomes (W/D/L) with an Elo + logistic mod
 
 **Repository:** [github.com/Breakeggs3000/world-cup-2026-oracle](https://github.com/Breakeggs3000/world-cup-2026-oracle)
 
+## Project structure
+
+```
+world-cup-2026-oracle/
+├── src/
+│   ├── backend/                    # FastAPI prediction API (Python 3.12)
+│   │   ├── app/
+│   │   │   ├── main.py             # App entry, CORS, lifespan, health
+│   │   │   ├── services.py         # Cached model loader + backtest helpers
+│   │   │   ├── api/                # REST route handlers
+│   │   │   │   ├── routes.py       # Composes all /api/v1 routers
+│   │   │   │   ├── predictions.py  # Single-match + scenario predict
+│   │   │   │   ├── wc2026.py       # 2026 fixtures + standings
+│   │   │   │   ├── matches.py      # Historical World Cup matches
+│   │   │   │   ├── simulation.py   # Monte Carlo tournament sim
+│   │   │   │   ├── backtest.py     # Walk-forward metrics API
+│   │   │   │   ├── models.py       # Model registry
+│   │   │   │   └── sync.py         # Live fixture sync status
+│   │   │   ├── model/              # Prediction engine
+│   │   │   │   ├── elo.py          # Chronological Elo ratings
+│   │   │   │   ├── predictor.py    # Features + logistic regression
+│   │   │   │   ├── backtest.py     # Train/val/test splits + metrics
+│   │   │   │   ├── artifacts.py    # Save/load trained model bundles
+│   │   │   │   └── simulation.py   # WC 2026 group-stage Monte Carlo
+│   │   │   ├── data/               # Data loading + static fixtures
+│   │   │   │   ├── loader.py       # results.csv, WC filters, team aliases
+│   │   │   │   ├── store.py        # Fixture persistence
+│   │   │   │   ├── wc2026_fixtures.json
+│   │   │   │   └── providers/      # Live score sync (API, HTML, seed)
+│   │   │   └── sync/               # Background fixture sync scheduler
+│   │   ├── scripts/                # fetch_data, train_model, run_backtest
+│   │   └── tests/                  # pytest (API, model, no-leakage)
+│   └── frontend/                   # React + Vite UI (Node 22)
+│       └── src/
+│           ├── api/client.ts       # Typed fetch wrapper → /api/v1
+│           ├── pages/              # One page per sidebar tab
+│           │   ├── BacktestDashboard.tsx
+│           │   ├── HistoricalWorldCup.tsx
+│           │   ├── WorldCup2026.tsx
+│           │   ├── MatchExplorer.tsx
+│           │   └── TournamentSim.tsx
+│           └── components/         # MatchCard, ProbabilityBar, charts, …
+├── workspace/artifacts/            # Generated outputs (not all committed)
+│   ├── models/                     # Trained model registry + joblib files
+│   └── backtest_report.json        # Validation/test metrics
+├── docs/                           # USAGE.md, DEPLOY.md
+└── tools/scripts/                  # start-dev.ps1, deploy helpers
+```
+
+| Layer | Role |
+|-------|------|
+| **Frontend** | React SPA — tabs call the API and render probabilities, scorelines, backtest charts |
+| **API** | FastAPI routers validate requests and delegate to services |
+| **Services** | Load the active model once (cached), expose history + predictions |
+| **Model** | Elo engine → 10 features → logistic regression → W/D/L + Poisson scorelines |
+| **Data** | Historical results CSV + curated WC 2026 fixtures + optional live sync |
+| **Artifacts** | Versioned trained models and backtest reports under `workspace/` |
+
+## How it works (high level)
+
+```mermaid
+flowchart TB
+    subgraph Data
+        CSV[results.csv<br/>international history]
+        FX[wc2026_fixtures.json]
+        SYNC[Live sync providers]
+    end
+
+    subgraph Backend["Backend (FastAPI)"]
+        API[API routers<br/>/predict /wc2026 /tournaments …]
+        SVC[services.get_trained_system]
+        ART[artifacts.load_model_bundle]
+        ELO[EloEngine<br/>chronological ratings]
+        FEAT[Feature builder<br/>form, rest, H2H, …]
+        LR[LogisticRegression<br/>W / D / L probabilities]
+        POIS[Poisson scorelines]
+    end
+
+    subgraph Frontend["Frontend (React)"]
+        PAGES[Pages: Backtest · History · WC2026 · Explorer · Sim]
+        CLIENT[api/client.ts]
+    end
+
+    CSV --> ELO
+    CSV --> FEAT
+    FX --> API
+    SYNC --> FX
+    ART --> LR
+    SVC --> ART
+    SVC --> CSV
+    API --> SVC
+    ELO --> FEAT
+    FEAT --> LR
+    LR --> POIS
+    API --> POIS
+    CLIENT -->|HTTP /api/v1| API
+    PAGES --> CLIENT
+```
+
+**Prediction path** (every upcoming or ad-hoc match):
+
+1. **Load history** — `load_results()` reads international match results from cache.
+2. **Elo snapshot** — replay all matches before the fixture date to get current team ratings.
+3. **Build features** — 10 inputs (Elo delta, form, rest days, knockout flag, H2H, …) using only past data.
+4. **Classify** — standardized features → trained logistic regression → `P(W)`, `P(D)`, `P(L)`.
+5. **Scorelines** — derive likely scores from outcome probs via independent Poisson rates.
+6. **Respond** — JSON with probabilities, predicted outcome, top scorelines; UI renders bars and cards.
+
+**Training path** (offline, `scripts/train_model.py`):
+
+1. Walk-forward over all historical matches (no future leakage).
+2. Fit logistic regression on data through 2017; validate 2018–2022; test after 2022.
+3. Persist predictor, Elo snapshot, metrics, and registry entry to `workspace/artifacts/models/`.
+
+**At runtime**, the backend loads the active model from the registry (or trains on first request if artifacts are missing). WC 2026 fixtures are enriched per request; Monte Carlo simulation samples outcomes from those probabilities across group-stage matches.
+
 ## Prerequisites
 
 Install these **once per machine** (global tooling only — project deps stay local):
